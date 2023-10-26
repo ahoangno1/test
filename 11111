@@ -1,0 +1,42 @@
+from tvDatafeed import TvDatafeed, Interval
+import pandas as pd
+import os
+from binance.client import Client
+import time
+
+# ... (other functions and imports)
+
+# Your username and password
+api_key = 'NaJnxo2k8u6KkO00e5xq1vUhbx2qsx8gQjG7pLwSR1HYCMKubSdsZz8ycfJei5pT'
+api_secret = 'vP3m8D6AXnFrCC3cghYjpoh6L0i6z7wSWllaU6Pzv7dlO22U6vxhRKe3cnY4qHY8'
+username = "murendaelenv1"
+password = "murendaelenv1"
+zigzag = pd.DataFrame(columns=['value', 'type', 'index'])
+# Initialize the TvDatafeed
+tv = TvDatafeed(username, password)
+df = tv.get_hist(symbol='FTMUSDTPERP', exchange='BINANCE', interval=Interval.in_5_minute, n_bars=10000, extended_session=True)
+df.reset_index(inplace=True)
+# Xóa cột "datetime" (chỉ mục trước đó) khỏi DataFrame
+df = df.drop(columns='datetime')
+
+last_check_time = None
+# Lấy thời gian hiện tại
+current_time = time.localtime()
+symbol='FTMUSDTPERP'
+while True:
+    current_time = time.localtime()
+    # Kiểm tra xem đã chuyển sang một phút mới chưa
+    if last_check_time is None or current_time.tm_min != last_check_time.tm_min:
+        # Chỉ thực hiện mã của bạn sau khi chuyển sang phút mới
+        interval = Interval.in_1_minute  # Thay đổi thành interval bạn muốn
+        n_bars = 10000  # Thay đổi số bars bạn muốn
+        last_check_time = current_time
+        df = get_historical_data(username, password, symbol, interval, n_bars)
+        
+        # Set options to display all columns and rows
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.max_rows', None)
+        
+        print(df)
+        
+    time.sleep(1)  # Chờ 1 giây trước khi kiểm tra lại
